@@ -117,6 +117,10 @@ class Interval
     @semitones, @quality, @interval = semitones, quality, interval
   end
 
+  def ==(other)
+    @semitones == other.semitones
+  end
+
   def below
     Interval.new(-@semitones, quality, -@interval)
   end
