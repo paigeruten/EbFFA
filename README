@@ -11,52 +11,52 @@ Notes are just notes, you know. They have a letter name like A or G, an octave, 
     irb> require 'ebffa'
       => true
     irb> C        # Note#inspect shows the note and its octave
-      => C4
+      => note C4
     irb> C.va(2)  # Note#va changes the octave
-      => C2
+      => note C2
     irb> Gs       # 's' means 'sharp'
-      => G#4
+      => note G#4
     irb> Bb.play  # Note#play plays the note through the bloopsaphone
       => nil
 
 Intervals describe intervals between notes. 26 Interval constants are defined for you, ranging from perfect unison (P1) to augmented octave (A8). The Note class implements the + method which takes an interval and raises (or lowers) the note by that interval and returns it. Here are some examples.
 
     irb> P4
-      => P4 A
+      => interval P4 A
     irb> Mn6.below
-      => Mn6 B
+      => interval Mn6 B
     irb> C + P5
-      => G4
+      => note G4
     irb> C + P5.below
-      => F3
+      => note F3
     irb> C - P5
-      => F3
+      => note F3
     irb> A + M3
-      => C#5
+      => note C#5
     irb> Fs + P8 + P8 + P8
-      => F#7
+      => note F#7
 
 Chords are just arrays of Notes. Chord#play plays the notes all at once through the bloopsaphone. A bunch of constructors are current implemented for making triads and four note chords and dominant/diminished seventh chords. Chords still need a lot of work. I'll be adding support for inversions, playing them melodically, transposing by adding an Interval maybe, there's all sorts of things. But here's what you can do so far.
 
     irb> Chord.new([C, E, G, Bb])
-      => [C4, E4, G4, Bb4]
+      => chord C4, E4, G4, Bb4
     irb> Chord.new([C, E, G, Bb]).play
       => nil
     irb> Chord.triad(D)
-      => [D4, F#4, A4]
+      => chord D4, F#4, A4
     irb> Chord.triad(D, :min)
-      => [D4, F4, A4]
+      => chord D4, F4, A4
     irb> Chord.triad(C, :dim)
-      => [C4, Eb4, Gb4]
+      => chord C4, Eb4, Gb4
     irb> Chord.triad(C, :halfdim)
-      => [C4, E4, Gb4]
+      => chord C4, E4, Gb4
     irb> Chord.four_note(G)
-      => [G4, B4, D5, G5]
+      => chord G4, B4, D5, G5
     irb> Chord.four_note(G, :min)
-      => [G4, Bb4, D5, G5]
+      => chord G4, Bb4, D5, G5
     irb> Chord.v7(C)
-      => [G4, B4, D5, F5]
+      => chord G4, B4, D5, F5
     irb> Chord.o7(C)
-      => [B3, D4, F4, Ab4]
+      => chord B3, D4, F4, Ab4
 
 So that's about it for now. I'm not sure what all I'll use this for. Maybe some ear testing, like listening to a random interval and guessing what it was. And chord identification. That'd be useful.

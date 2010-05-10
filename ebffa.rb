@@ -56,7 +56,7 @@ class Note
   end
 
   def inspect
-    to_s
+    "note " + to_s
   end
 
   def _add_note_letter(letter, interval)
@@ -120,7 +120,7 @@ class Interval
   end
 
   def inspect
-    to_s
+    "interval " + to_s
   end
 end
 
@@ -168,7 +168,7 @@ class Chord
   end
 
   def inspect
-    @notes.inspect
+    "chord " + @notes.map { |note| note.to_s }.join(", ")
   end
 
   def self.triad(tonic, quality = :maj)
