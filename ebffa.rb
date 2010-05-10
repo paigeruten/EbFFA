@@ -178,10 +178,15 @@ class Chord
     end
   end
 
-  def play
+  def play(how = :harmonic)
     b = Bloops.new
-    @notes.each do |note|
-      b.tune SOUND, note.bloops_note
+    case how
+    when :harmonic
+      @notes.each do |note|
+        b.tune SOUND, note.bloops_note
+      end
+    when :melodic
+      b.tune SOUND, @notes.map { |note| note.bloops_note }.join(" ")
     end
     b.play
     sleep(0.1) until b.stopped?
