@@ -36,11 +36,13 @@ Intervals describe intervals between notes. 26 Interval constants are defined fo
     irb> Fs + P8 + P8 + P8
       => note F#7
 
-Chords are just arrays of Notes. Chord#play plays the notes all at once through the bloopsaphone. A bunch of constructors are current implemented for making triads and four note chords and dominant/diminished seventh chords. Chords still need a lot of work. I'll be adding support for inversions, playing them melodically, transposing by adding an Interval maybe, there's all sorts of things. But here's what you can do so far.
+Chords are just arrays of Notes. Chord#play plays the notes all at once through the bloopsaphone, harmonically or melodically. A bunch of constructors are currently implemented for making triads and dominant seventh and diminished seventh chords. You can transpose a chord by adding or subtracting an Interval. You can invert a chord using Chord#invert or by passing the inversion of the chord you want as the last argument to a chord constructor (not Chord#new). Examples.
 
     irb> Chord.new([C, E, G, Bb])
       => chord C4, E4, G4, Bb4
     irb> Chord.new([C, E, G, Bb]).play
+      => nil
+    irb> Chord.new([C, E, G, Bb]).play(:melodic)
       => nil
     irb> Chord.triad(D)
       => chord D4, F#4, A4
@@ -58,5 +60,7 @@ Chords are just arrays of Notes. Chord#play plays the notes all at once through 
       => chord B3, D4, F4, Ab4
     irb> Chord.o7(C, 3)            # third inversion
       => chord Ab4, B4, D5, F5
+    irb> Chord.triad(D) + P5
+      => chord A4, C#5, E5
 
 So that's about it for now. I'm not sure what all I'll use this for. Maybe some ear testing, like listening to a random interval and guessing what it was. And chord identification. That'd be useful.

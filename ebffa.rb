@@ -196,6 +196,14 @@ class Chord
     "chord " + @notes.map { |note| note.to_s }.join(", ")
   end
 
+  def +(interval)
+    Chord.new @notes.map { |note| note + interval }
+  end
+
+  def -(interval)
+    Chord.new @notes.map { |note| note - interval }
+  end
+
   def invert
     chord = self.dup
     chord.invert!
