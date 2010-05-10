@@ -8,6 +8,12 @@ class EarTest
     @max_score = 0
   end
 
+  def done
+    puts "The test is over."
+    puts "You got #{@score} questions right out of #{@max_score}."
+    puts "That means you got %#{@score*100/@max_score}."
+  end
+
   def correct!
     @score += 1
     @max_score += 1
@@ -72,7 +78,11 @@ if ARGV.empty? or ! Tests.map { |t| t.to_s }.include? ARGV[0]
 end
 
 test = eval(ARGV[0]).new
-loop do
+print "Hey, Welcome to the #{test.class}! How many questions do you want? "
+num_questions = STDIN.gets.to_i
+num_questions.times do
   test.question
 end
+
+test.done
 
