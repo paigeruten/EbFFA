@@ -46,17 +46,17 @@ Chords are just arrays of Notes. Chord#play plays the notes all at once through 
       => chord D4, F#4, A4
     irb> Chord.triad(D, :min)
       => chord D4, F4, A4
+    irb> Chord.triad(D, :maj, 1)   # D+ first inversion
+      => chord F#4, A4, D5
     irb> Chord.triad(C, :dim)
       => chord C4, Eb4, Gb4
     irb> Chord.triad(C, :halfdim)
       => chord C4, E4, Gb4
-    irb> Chord.four_note(G)
-      => chord G4, B4, D5, G5
-    irb> Chord.four_note(G, :min)
-      => chord G4, Bb4, D5, G5
     irb> Chord.v7(C)
       => chord G4, B4, D5, F5
     irb> Chord.o7(C)
       => chord B3, D4, F4, Ab4
+    irb> Chord.o7(C, 3)            # third inversion
+      => chord Ab4, B4, D5, F5
 
 So that's about it for now. I'm not sure what all I'll use this for. Maybe some ear testing, like listening to a random interval and guessing what it was. And chord identification. That'd be useful.

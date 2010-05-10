@@ -235,7 +235,7 @@ class Chord
 
   def self.o7(tonic, inversion = 0)
     root = tonic - Mn2
-    new [root, root + Mn3, root + D5, root + D7]
+    c = new [root, root + Mn3, root + D5, root + D7]
     inversion.times { c.invert! }
     c
   end
