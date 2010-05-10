@@ -13,6 +13,18 @@ class Note
     @semitones == other.semitones
   end
 
+  def <=>(other)
+    @semitones <=> other.semitones
+  end
+
+  def >(other)
+    @semitones > other.semitones
+  end
+
+  def <(other)
+    @semitones < other.semitones
+  end
+
   def +(interval)
     new_semitones = @semitones + interval.semitones
     new_letter = _add_note_letter(@letter, interval.interval)
@@ -152,10 +164,18 @@ P8  = Interval.new(12, :per, 8)
 A8  = Interval.new(13, :aug, 8)
 
 class Chord
+  include Enumerable
+
   attr_accessor :notes
 
   def initialize(notes)
     @notes = notes
+  end
+
+  def each
+    @notes.each do |note|
+      yield note
+    end
   end
 
   def play
@@ -171,31 +191,48 @@ class Chord
     "chord " + @notes.map { |note| note.to_s }.join(", ")
   end
 
-  def self.triad(tonic, quality = :maj)
+  def invert
+    chord = self.dup
+    chord.invert!
+    chord
+  end
+
+  def invert!
+    min = @notes.delete(@notes.min)
+    max = @notes.max
+
+    min += P8 until min > max
+
+    @notes << min
+  end
+
+  def self.triad(tonic, quality = :maj, inversion = 0)
     case quality
     when :maj
-      new [tonic, tonic + M3, tonic + P5]
+      c = new [tonic, tonic + M3, tonic + P5]
     when :min
-      new [tonic, tonic + Mn3, tonic + P5]
+      c = new [tonic, tonic + Mn3, tonic + P5]
     when :dim
-      new [tonic, tonic + Mn3, tonic + D5]
+      c = new [tonic, tonic + Mn3, tonic + D5]
     when :halfdim
-      new [tonic, tonic + M3, tonic + D5]
+      c = new [tonic, tonic + M3, tonic + D5]
     end
+    inversion.times { c.invert! }
+    c
   end
 
-  def self.four_note(tonic, quality = :maj)
-    new(Chord.triad(tonic, quality).notes + [tonic + P8])
-  end
-
-  def self.v7(tonic)
+  def self.v7(tonic, inversion = 0)
     root = tonic + P5
-    new [root, root + M3, root + P5, root + Mn7]
+    c = new [root, root + M3, root + P5, root + Mn7]
+    inversion.times { c.invert! }
+    c
   end
 
-  def self.o7(tonic)
+  def self.o7(tonic, inversion = 0)
     root = tonic - Mn2
     new [root, root + Mn3, root + D5, root + D7]
+    inversion.times { c.invert! }
+    c
   end
 end
 
