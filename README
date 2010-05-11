@@ -62,5 +62,3 @@ Chords are just arrays of Notes. Chord#play plays the notes all at once through 
       => chord Ab4, B4, D5, F5
     irb> Chord.triad(D) + P5
       => chord A4, C#5, E5
-
-So that's about it for now. I'm not sure what all I'll use this for. Maybe some ear testing, like listening to a random interval and guessing what it was. And chord identification. That'd be useful.
