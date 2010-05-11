@@ -2,6 +2,8 @@
 
 require 'ebffa'
 
+NOTES = [C, Cs, D, Ds, E, F, Fs, G, Gs, A, As, B]
+
 class EarTest
   def initialize
     @score = 0
@@ -11,7 +13,7 @@ class EarTest
   def done
     puts "The test is over."
     puts "You got #{@score} questions right out of #{@max_score}."
-    puts "That means you got %#{@score*100/@max_score}."
+    puts "That means you got #{@score*100/@max_score}%."
   end
 
   def correct!
@@ -30,7 +32,6 @@ end
 
 class IntervalTest < EarTest
   INTERVALS = [Mn2, M2, Mn3, M3, P4, A4, P5, Mn6, M6, Mn7, M7, P8]
-  NOTES = [C, Cs, D, Ds, E, F, Fs, G, Gs, A, As, B]
 
   def question
     interval = INTERVALS.shuffle.first
@@ -60,8 +61,44 @@ class IntervalTest < EarTest
 end
 
 class ChordIdentTest < EarTest
-  def question
+  CHORDS = [:major, :minor, :v7, :o7, :major_1st, :minor_1st]
 
+  def question
+    chord_type = CHORDS.shuffle.first
+    tonic = NOTES.shuffle.first
+
+    case chord_type
+    when :major
+      chord = Chord.triad(tonic)
+    when :minor
+      chord = Chord.triad(tonic, :min)
+    when :v7
+      chord = Chord.v7(tonic)
+    when :o7
+      chord = Chord.o7(tonic)
+    when :major_1st
+      chord = Chord.triad(tonic, :maj, 1)
+    when :minor_1st
+      chord = Chord.triad(tonic, :min, 1)
+    end
+
+    chord.play
+
+    puts "What type of chord was that?"
+    puts "  1. Major (root position)"
+    puts "  2. Minor (root position)"
+    puts "  3. Dominant 7th"
+    puts "  4. Diminished 7th"
+    puts "  5. Major 1st inversion"
+    puts "  6. Minor 1st inversion"
+    print "Enter the # of your choice: "
+    guess = STDIN.gets.to_i until (1..6) === guess
+
+    if CHORDS[guess - 1] == chord_type
+      correct!
+    else
+      wrong!
+    end
   end
 end
 
