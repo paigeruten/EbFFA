@@ -52,7 +52,7 @@ class Note
 
   # lower a note by a certain number of octaves
   def <<(octaves)
-    Note.new(@semitones - octaves * 12, @letter, @accidental)
+    self >> -octaves
   end
 
   # find the interval between two notes
