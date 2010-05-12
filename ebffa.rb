@@ -37,12 +37,12 @@ class Note
   end
 
   # raise (or lower) a note by a certain interval
-  def ^(interval) # irb> Es ^ P5
-    new_semitones = @semitones + interval.semitones # => 12
-    new_letter = _add_note_letter(@letter, interval.interval) # => 'B'
+  def ^(interval)
+    new_semitones = @semitones + interval.semitones
+    new_letter = _add_note_letter(@letter, interval.interval)
 
-    new_letter_semitones = _letter_to_semitones(new_letter) # => 11
-    offset = (new_letter_semitones % 12) - (new_semitones % 12) # => 11
+    new_letter_semitones = _letter_to_semitones(new_letter)
+    offset = (new_letter_semitones % 12) - (new_semitones % 12)
 
     new_accidental = { -2 => :ss, -1 => :s, 0 => :n, 1 => :b, 2 => :bb }[offset]
 
