@@ -57,10 +57,10 @@ class Note
 
   # find the interval between two notes
   def -(other)
-    delta = other.semitones - @semitones # => 12
-    delta_mod = delta.abs % 12 # => 0
+    delta = other.semitones - @semitones
+    delta_mod = delta.abs % 12
 
-    interval = [P1, Mn2, M2, Mn3, M3, P4, A4, P5, Mn6, M6, Mn7, M7][delta_mod] # => P5
+    interval = [P1, Mn2, M2, Mn3, M3, P4, A4, P5, Mn6, M6, Mn7, M7][delta_mod]
     result_interval = Interval.new(delta.abs, interval.quality, interval.interval + delta.abs / 12 * 7)
     result_interval = result_interval.below if delta < 0
 
