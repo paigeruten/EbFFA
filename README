@@ -18,31 +18,43 @@ Notes are just notes, you know. They have a letter name like A or G, an octave, 
       => note G#4
     irb> Bb.play  # Note#play plays the note through the bloopsaphone
       => nil
+    irb> F >> 2   # raises note by two octaves
+      => note F6
+    irb> G << 3   # lowers note by three octaves
+      => note G1
+    irb> Eb == Ds # enharmonic notes are equal
+      => true
+    irb> C.va(4) > C.va(3)
+      => true
 
-Intervals describe intervals between notes. 26 Interval constants are defined for you, ranging from perfect unison (P1) to augmented octave (A8). The Note class implements the + method which takes an interval and raises (or lowers) the note by that interval and returns it. Here are some examples.
+Intervals describe intervals between notes. 26 Interval constants are defined for you, ranging from perfect unison (P1) to augmented octave (A8). The Note class implements the ^ method which takes an interval and raises (or lowers) the note by that interval and returns it. It also implements the - method which takes two notes and returns the interval between them. Here are some examples.
 
     irb> P4
       => interval P4 A
     irb> Mn6.below
       => interval Mn6 B
-    irb> C + P5
+    irb> C ^ P5
       => note G4
-    irb> C + P5.below
+    irb> C ^ P5.below
       => note F3
-    irb> C - P5
-      => note F3
-    irb> A + M3
+    irb> A ^ M3
       => note C#5
-    irb> Fs + P8 + P8 + P8
-      => note F#7
+    irb> Fs ^ P8
+      => note F#5
+    irb> C - G
+      => interval P5 A
+    irb> C - (G << 1)
+      => interval P4 B
+    irb> C - (C >> 2)
+      => interval P15 A
 
-Chords are just arrays of Notes. Chord#play plays the notes all at once through the bloopsaphone, harmonically or melodically. A bunch of constructors are currently implemented for making triads and dominant seventh and diminished seventh chords. You can transpose a chord by adding or subtracting an Interval. You can invert a chord using Chord#invert or by passing the inversion of the chord you want as the last argument to a chord constructor (not Chord#new). Examples.
+Chords are just arrays of Notes. Make Chords by adding together Notes with +. Chord#play plays the notes all at once through the bloopsaphone, harmonically or melodically. A bunch of constructors are currently implemented for making triads and dominant seventh and diminished seventh chords. You can transpose a chord by raising it to an Interval with ^. You can invert a chord using Chord#invert or by passing the inversion of the chord you want as the last argument to a chord constructor (not Chord#new). Examples.
 
-    irb> Chord.new([C, E, G, Bb])
+    irb> C + E + G + Bb
       => chord C4, E4, G4, Bb4
-    irb> Chord.new([C, E, G, Bb]).play
+    irb> (C + E + G + Bb).play
       => nil
-    irb> Chord.new([C, E, G, Bb]).play(:melodic)
+    irb> (C + E + G + Bb).play(:melodic)
       => nil
     irb> Chord.triad(D)
       => chord D4, F#4, A4
@@ -60,5 +72,7 @@ Chords are just arrays of Notes. Chord#play plays the notes all at once through 
       => chord B3, D4, F4, Ab4
     irb> Chord.o7(C, 3)            # third inversion
       => chord Ab4, B4, D5, F5
-    irb> Chord.triad(D) + P5
+    irb> Chord.triad(D) ^ P5
       => chord A4, C#5, E5
+    irb> Chord.triad(F) >> 2
+      => chord F6, A6, C7
