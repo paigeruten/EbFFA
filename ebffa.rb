@@ -3,32 +3,22 @@ require 'bloops'
 SOUND = Bloops.sound Bloops::SQUARE
 
 class Note
+  include Comparable
+
   attr_accessor :semitones, :letter, :accidental
 
   def initialize(semitones, letter, accidental = :n)
     @semitones, @letter, @accidental = semitones, letter, accidental
   end
 
-  # test for equality in pitch
-  def ==(other)
-    @semitones == other.semitones
+  # compare notes by pitch
+  def <=>(other)
+    @semitones <=> other.semitones
   end
 
   # test for equality in pitch, ignoring what octave they're in
   def ===(other)
     @semitones.abs % 12 == other.semitones.abs % 12
-  end
-
-  def <=>(other)
-    @semitones <=> other.semitones
-  end
-
-  def >(other)
-    @semitones > other.semitones
-  end
-
-  def <(other)
-    @semitones < other.semitones
   end
 
   # collect two notes into a Chord
