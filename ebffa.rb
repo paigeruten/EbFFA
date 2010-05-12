@@ -18,7 +18,12 @@ class Note
 
   # test for equality in pitch, ignoring what octave they're in
   def ===(other)
-    @semitones.abs % 12 == other.semitones.abs % 12
+    base == other.base
+  end
+
+  # raise or lower the note to octave 4, used for comparing notes regardless of octave
+  def base
+    Note.new(@semitones % 12, @letter, @accidental)
   end
 
   # collect two notes into a Chord
@@ -74,8 +79,7 @@ class Note
 
   # raise or lower note to the specified octave
   def va(octave)
-    new_interval = (@semitones % 12) + ((octave - 4) * 12)
-    Note.new(new_interval, @letter, @accidental)
+    base << 4 >> octave
   end
 
   # play the note through the bloopsaphone
