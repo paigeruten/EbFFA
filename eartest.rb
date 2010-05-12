@@ -12,8 +12,8 @@ class EarTest
 
   def done
     puts "The test is over."
-    puts "You got #{@score} questions right out of #{@max_score}."
-    puts "That means you got #{@score*100/@max_score}%."
+    puts "You got #{ @score } questions right out of #{ @max_score }."
+    puts "That means you got #{ @score * 100 / @max_score }%."
   end
 
   def correct!
@@ -38,11 +38,11 @@ class IntervalTest < EarTest
     interval = interval.below if rand(2) == 0
 
     first_note = NOTES.shuffle.first
-    first_note -= P8 if rand(2) == 0
+    first_note <<= 1 if rand(2) == 0
 
     last_note = first_note + interval
 
-    chord = Chord.new [first_note, last_note]
+    chord = first_note + last_note
     chord.play(:melodic)
 
     print "What interval was that? "

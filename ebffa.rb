@@ -9,8 +9,14 @@ class Note
     @semitones, @letter, @accidental = semitones, letter, accidental
   end
 
+  # test for equality in pitch
   def ==(other)
     @semitones == other.semitones
+  end
+
+  # test for equality in pitch, ignoring what octave they're in
+  def ===(other)
+    @semitones.abs % 12 == other.semitones.abs % 12
   end
 
   def <=>(other)
@@ -25,31 +31,64 @@ class Note
     @semitones < other.semitones
   end
 
-  def +(interval)
-    new_semitones = @semitones + interval.semitones
-    new_letter = _add_note_letter(@letter, interval.interval)
+  # collect two notes into a Chord
+  def +(other)
+    Chord.new [self, other]
+  end
 
-    new_letter_semitones = _letter_to_semitones(new_letter)
-    offset = (new_letter_semitones % 12) - (new_semitones % 12)
+  # raise (or lower) a note by a certain interval
+  def ^(interval) # irb> Es ^ P5
+    new_semitones = @semitones + interval.semitones # => 12
+    new_letter = _add_note_letter(@letter, interval.interval) # => 'B'
+
+    new_letter_semitones = _letter_to_semitones(new_letter) # => 11
+    offset = (new_letter_semitones % 12) - (new_semitones % 12) # => 11
 
     new_accidental = { -2 => :ss, -1 => :s, 0 => :n, 1 => :b, 2 => :bb }[offset]
+
+    # special cases for the difference between a B and C, which should really be
+    # 1 semitone, but isn't the way they're being represented. might have to
+    # rewrite this whole method...
+    new_accidental = :s if offset == 11
+    new_accidental = :b if offset == -12
 
     Note.new(new_semitones, new_letter, new_accidental)
   end
 
-  def -(interval)
-    self + interval.below
+  # raise a note by a certain number of octaves
+  def >>(octaves)
+    Note.new(@semitones + octaves * 12, @letter, @accidental)
   end
 
+  # lower a note by a certain number of octaves
+  def <<(octaves)
+    Note.new(@semitones - octaves * 12, @letter, @accidental)
+  end
+
+  # find the interval between two notes
+  def -(other)
+    delta = other.semitones - @semitones # => 12
+    delta_mod = delta.abs % 12 # => 0
+
+    interval = [P1, Mn2, M2, Mn3, M3, P4, A4, P5, Mn6, M6, Mn7, M7][delta_mod] # => P5
+    result_interval = Interval.new(delta.abs, interval.quality, interval.interval + delta.abs / 12 * 7)
+    result_interval = result_interval.below if delta < 0
+
+    result_interval
+  end
+
+  # get the octave the note is in (middle C is octave 4)
   def octave
     @semitones / 12 + 4
   end
 
+  # raise or lower note to the specified octave
   def va(octave)
     new_interval = (@semitones % 12) + ((octave - 4) * 12)
     Note.new(new_interval, @letter, @accidental)
   end
 
+  # play the note through the bloopsaphone
   def play
     b = Bloops.new
     b.tune SOUND, bloops_note
@@ -57,6 +96,7 @@ class Note
     sleep(0.1) until b.stopped?
   end
 
+  # put the note into bloopsaphone's language
   def bloops_note
     note = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'][@semitones % 12]
     note + octave.to_s
@@ -122,7 +162,7 @@ class Interval
   end
 
   def below
-    Interval.new(-@semitones, quality, -@interval)
+    Interval.new(-@semitones, @quality, -@interval)
   end
 
   def to_s
@@ -182,6 +222,37 @@ class Chord
     end
   end
 
+  # checks if the two chords have the exact same notes, regardless of order
+  def ==(other)
+    @notes.sort == other.notes.sort
+  end
+
+  # checks if the two chords have the same notes, regardless of order and
+  # ignoring the notes' octave
+  def ===(other)
+    @notes.map { |note| note.va(0) }.sort == other.notes.map { |note| note.va(0) }.sort
+  end
+
+  # adds a note to the chord, or the notes of a chord to the chord
+  def +(other)
+    if other.is_a? Note
+      Chord.new(@notes + [other])
+    elsif other.is_a? Chord
+      Chord.new(@notes + other.notes)
+    end
+  end
+
+  # raise whole chord by a certain number of octaves
+  def >>(octaves)
+    Chord.new(@notes.map { |note| note >> octaves })
+  end
+
+  # lower whole chord by a certain number of octaves
+  def <<(octaves)
+    Chord.new(@notes.map { |note| note << octaves })
+  end
+
+  # play chord through the bloopsaphone, in a :harmonic or :melodic way
   def play(how = :harmonic)
     b = Bloops.new
     case how
@@ -200,12 +271,20 @@ class Chord
     "chord " + @notes.map { |note| note.to_s }.join(", ")
   end
 
-  def +(interval)
-    Chord.new @notes.map { |note| note + interval }
+  # raise (or lower) the whole chord by a certain interval
+  def ^(interval)
+    Chord.new @notes.map { |note| note ^ interval }
   end
 
-  def -(interval)
-    Chord.new @notes.map { |note| note - interval }
+  # raise the lowest note in the chord by octaves until it is the highest note
+  # in the chord
+  def invert!
+    min = @notes.delete(@notes.min)
+    max = @notes.max
+
+    min >>= 1 until min > max
+
+    @notes << min
   end
 
   def invert
@@ -214,40 +293,35 @@ class Chord
     chord
   end
 
-  def invert!
-    min = @notes.delete(@notes.min)
-    max = @notes.max
-
-    min += P8 until min > max
-
-    @notes << min
-  end
-
+  # construct a triad from a particular tonic, quality (major, minor,
+  # diminished, or half-diminished), and inversion
   def self.triad(tonic, quality = :maj, inversion = 0)
     case quality
     when :maj
-      c = new [tonic, tonic + M3, tonic + P5]
+      c = new [tonic, tonic ^ M3, tonic ^ P5]
     when :min
-      c = new [tonic, tonic + Mn3, tonic + P5]
+      c = new [tonic, tonic ^ Mn3, tonic ^ P5]
     when :dim
-      c = new [tonic, tonic + Mn3, tonic + D5]
+      c = new [tonic, tonic ^ Mn3, tonic ^ D5]
     when :halfdim
-      c = new [tonic, tonic + M3, tonic + D5]
+      c = new [tonic, tonic ^ M3, tonic ^ D5]
     end
     inversion.times { c.invert! }
     c
   end
 
+  # construct a dominant seventh chord
   def self.v7(tonic, inversion = 0)
-    root = tonic + P5
-    c = new [root, root + M3, root + P5, root + Mn7]
+    root = tonic ^ P5
+    c = new [root, root ^ M3, root ^ P5, root ^ Mn7]
     inversion.times { c.invert! }
     c
   end
 
+  # construct a diminished seventh chord
   def self.o7(tonic, inversion = 0)
-    root = tonic - Mn2
-    c = new [root, root + Mn3, root + D5, root + D7]
+    root = tonic ^ Mn2.below
+    c = new [root, root ^ Mn3, root ^ D5, root ^ D7]
     inversion.times { c.invert! }
     c
   end
