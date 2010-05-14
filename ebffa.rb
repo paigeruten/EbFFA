@@ -5,10 +5,14 @@ SOUND = Bloops.sound Bloops::SQUARE
 class Note
   include Comparable
 
-  attr_accessor :semitones, :letter, :accidental
+  attr_reader :semitones, :letter, :accidental, :octave
 
-  def initialize(semitones, letter, accidental = :n)
-    @semitones, @letter, @accidental = semitones, letter, accidental
+  def initialize(letter, accidental = :n, octave = 4)
+    @letter, @accidental, @octave = letter, accidental, octave
+
+    @semitones = _letter_to_semitones(@letter) +
+                 _accidental_to_semitones(@accidental) +
+                 12 * (@octave - 4)
   end
 
   # compare notes by pitch
@@ -23,7 +27,7 @@ class Note
 
   # raise or lower the note to octave 4, used for comparing notes regardless of octave
   def base
-    Note.new(@semitones % 12, @letter, @accidental)
+    Note.new(@letter, @accidental)
   end
 
   # collect two notes into a Chord
@@ -47,12 +51,12 @@ class Note
     new_accidental = :s if offset == 11
     new_accidental = :b if offset == -12
 
-    Note.new(new_semitones, new_letter, new_accidental)
+    Note.new(new_letter, new_accidental, _semitones_to_octave(new_semitones))
   end
 
   # raise a note by a certain number of octaves
   def >>(octaves)
-    Note.new(@semitones + octaves * 12, @letter, @accidental)
+    Note.new(@letter, @accidental, @octave + octaves)
   end
 
   # lower a note by a certain number of octaves
@@ -74,12 +78,12 @@ class Note
 
   # get the octave the note is in (middle C is octave 4)
   def octave
-    @semitones / 12 + 4
+    @octave
   end
 
   # raise or lower note to the specified octave
   def va(octave)
-    base << 4 >> octave
+    Note.new(@letter, @accidental, octave)
   end
 
   # play the note through the bloopsaphone
@@ -120,29 +124,37 @@ class Note
   def _letter_to_semitones(letter)
     { :C => 0, :D => 2, :E => 4, :F => 5, :G => 7, :A => 9, :B => 11 }[letter.to_sym]
   end
+
+  def _accidental_to_semitones(accidental)
+    { :bb => -2, :b => -1, :n => 0, :s => 1, :ss => 2 }[accidental.to_sym] || 0
+  end
+
+  def _semitones_to_octave(semitones)
+    semitones / 12 + 4
+  end
 end
 
-C  = Note.new(0, :C)
-Bs = Note.new(0, :B, :s)
-Cs = Note.new(1, :C, :s)
-Db = Note.new(1, :D, :b)
-D  = Note.new(2, :D)
-Ds = Note.new(3, :D, :s)
-Eb = Note.new(3, :E, :b)
-E  = Note.new(4, :E)
-Fb = Note.new(4, :F, :b)
-F  = Note.new(5, :F)
-Es = Note.new(5, :E, :s)
-Fs = Note.new(6, :F, :s)
-Gb = Note.new(6, :G, :b)
-G  = Note.new(7, :G)
-Gs = Note.new(8, :G, :s)
-Ab = Note.new(8, :A, :b)
-A  = Note.new(9, :A)
-As = Note.new(10, :A, :s)
-Bb = Note.new(10, :B, :b)
-B  = Note.new(11, :B)
-Cb = Note.new(11, :C, :b)
+C  = Note.new(:C)
+Bs = Note.new(:B, :s)
+Cs = Note.new(:C, :s)
+Db = Note.new(:D, :b)
+D  = Note.new(:D)
+Ds = Note.new(:D, :s)
+Eb = Note.new(:E, :b)
+E  = Note.new(:E)
+Fb = Note.new(:F, :b)
+F  = Note.new(:F)
+Es = Note.new(:E, :s)
+Fs = Note.new(:F, :s)
+Gb = Note.new(:G, :b)
+G  = Note.new(:G)
+Gs = Note.new(:G, :s)
+Ab = Note.new(:A, :b)
+A  = Note.new(:A)
+As = Note.new(:A, :s)
+Bb = Note.new(:B, :b)
+B  = Note.new(:B)
+Cb = Note.new(:C, :b)
 
 class Interval
   attr_accessor :semitones, :quality, :interval
