@@ -40,7 +40,7 @@ class IntervalTest < EarTest
     first_note = NOTES.shuffle.first
     first_note <<= 1 if rand(2) == 0
 
-    last_note = first_note + interval
+    last_note = first_note ^ interval
 
     chord = first_note + last_note
     chord.play(:melodic)
@@ -105,7 +105,7 @@ end
 Tests = [IntervalTest, ChordIdentTest]
 
 if ARGV.empty? or ! Tests.map { |t| t.to_s }.include? ARGV[0]
-  puts "Usage: $0 TestName"
+  puts "Usage: #{$0} TestName"
   puts
   puts "Available tests are:"
   Tests.each do |test|

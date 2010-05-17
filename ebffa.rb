@@ -12,7 +12,7 @@ class Note
 
     @semitones = _letter_to_semitones(@letter) +
                  _accidental_to_semitones(@accidental) +
-                 12 * (@octave - 4)
+                 _octave_to_semitones(@octave)
   end
 
   # compare notes by pitch
@@ -110,15 +110,8 @@ class Note
   end
 
   def _add_note_letter(letter, interval)
-    if interval > 0
-      interval -= 1
-    else
-      interval += 1
-    end
-    num = letter.to_s[0] - ?A
-    num += interval
-    num %= 7
-    (num + ?A).chr
+    interval += interval > 0 ? -1 : 1
+    %w{ A B C D E F G }[(letter.to_s.upcase[0] - ?A + interval) % 7]
   end
 
   def _letter_to_semitones(letter)
@@ -126,11 +119,15 @@ class Note
   end
 
   def _accidental_to_semitones(accidental)
-    { :bb => -2, :b => -1, :n => 0, :s => 1, :ss => 2 }[accidental.to_sym] || 0
+    { :bb => -2, :b => -1, :n => 0, :s => 1, :ss => 2 }[accidental.to_sym]
   end
 
   def _semitones_to_octave(semitones)
     semitones / 12 + 4
+  end
+
+  def _octave_to_semitones(octave)
+    12 * (octave - 4)
   end
 end
 
