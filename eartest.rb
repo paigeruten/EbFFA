@@ -16,6 +16,17 @@ class EarTest
     puts "That means you got #{ @score * 100 / @max_score }%."
   end
 
+  def next
+    puts "Question ##{ @max_score + 1 }"
+    puts "(press enter when you're ready)"
+
+    STDIN.gets
+
+    question
+
+    puts
+  end
+
   def correct!
     @score += 1
     @max_score += 1
@@ -23,10 +34,11 @@ class EarTest
     puts "You're right!"
   end
 
-  def wrong!
+  def wrong!(answer = nil)
     @max_score += 1
 
     puts "Nope, you're wrong."
+    puts "The answer is #{answer}." if answer
   end
 end
 
@@ -34,16 +46,13 @@ class IntervalTest < EarTest
   INTERVALS = [Mn2, M2, Mn3, M3, P4, A4, P5, Mn6, M6, Mn7, M7, P8]
 
   def question
+    tonic = NOTES.shuffle.first
+    tonic <<= 1 if rand(2) == 0
+
     interval = INTERVALS.shuffle.first
     interval = interval.below if rand(2) == 0
 
-    first_note = NOTES.shuffle.first
-    first_note <<= 1 if rand(2) == 0
-
-    last_note = first_note ^ interval
-
-    chord = first_note + last_note
-    chord.play(:melodic)
+    (tonic + (tonic ^ interval)).play(:melodic)
 
     print "What interval was that? "
     guess = STDIN.gets.chomp
@@ -55,16 +64,23 @@ class IntervalTest < EarTest
     if guess_interval == interval
       correct!
     else
-      wrong!
+      wrong! interval.to_s
     end
   end
 end
 
 class ChordIdentTest < EarTest
-  CHORDS = [:major, :minor, :v7, :o7, :major_1st, :minor_1st]
+  CHORDS = {
+    :major => "Major (root)",
+    :minor => "Minor (root)",
+    :v7 => "Dominant seventh",
+    :o7 => "Diminished seventh",
+    :major_1st => "Major (first)",
+    :minor_1st => "Minor (first)"
+  }
 
   def question
-    chord_type = CHORDS.shuffle.first
+    chord_type = CHORDS.keys.shuffle.first
     tonic = NOTES.shuffle.first
 
     case chord_type
@@ -85,19 +101,21 @@ class ChordIdentTest < EarTest
     chord.play
 
     puts "What type of chord was that?"
-    puts "  1. Major (root position)"
-    puts "  2. Minor (root position)"
-    puts "  3. Dominant 7th"
-    puts "  4. Diminished 7th"
-    puts "  5. Major 1st inversion"
-    puts "  6. Minor 1st inversion"
-    print "Enter the # of your choice: "
+
+    choice_number = 1
+    answer = nil
+    CHORDS.each do |type, name|
+      puts "  %d. %s" % [choice_number, name]
+      answer = choice_number if type == chord_type
+      choice_number += 1
+    end
+
     guess = STDIN.gets.to_i until (1..6) === guess
 
-    if CHORDS[guess - 1] == chord_type
+    if guess == answer
       correct!
     else
-      wrong!
+      wrong! answer.to_s
     end
   end
 end
@@ -118,7 +136,7 @@ test = eval(ARGV[0]).new
 print "Hey, Welcome to the #{test.class}! How many questions do you want? "
 num_questions = STDIN.gets.to_i
 num_questions.times do
-  test.question
+  test.next
 end
 
 test.done
