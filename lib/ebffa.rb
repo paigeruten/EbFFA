@@ -70,7 +70,7 @@ class Note
     delta_mod = delta.abs % 12
 
     interval = [P1, Mn2, M2, Mn3, M3, P4, A4, P5, Mn6, M6, Mn7, M7][delta_mod]
-    result_interval = Interval.new(delta.abs, interval.quality, interval.interval + delta.abs / 12 * 7)
+    result_interval = Interval.new(interval.quality, interval.interval + delta.abs / 12 * 7)
     result_interval = result_interval.below if delta < 0
 
     result_interval
@@ -156,8 +156,10 @@ Cb = Note.new(:C, :b)
 class Interval
   attr_accessor :semitones, :quality, :interval
 
-  def initialize(semitones, quality, interval)
-    @semitones, @quality, @interval = semitones, quality, interval
+  def initialize(quality, interval)
+    @quality, @interval = quality, interval
+
+    @semitones = _interval_to_semitones(@quality, @interval)
   end
 
   def ==(other)
@@ -165,7 +167,7 @@ class Interval
   end
 
   def below
-    Interval.new(-@semitones, @quality, -@interval)
+    Interval.new(@quality, -@interval)
   end
 
   def to_s
@@ -181,34 +183,52 @@ class Interval
   def inspect
     "interval " + to_s
   end
+
+  def _interval_to_semitones(quality, interval)
+    base_interval = (interval.abs - 1) % 7 + 1
+
+    base_semitones = [nil, 0, 2, 4, 5, 7, 9, 11][base_interval]
+    octaves = (interval.abs - 1) / 7
+    semitones = base_semitones + octaves * 12
+
+    if [1, 4, 5].include? base_interval
+      qualities = { :per => 0, :dim => -1, :aug => 1 }
+    else
+      qualities = { :maj => 0, :min => -1, :dim => -2, :aug => 1 }
+    end
+
+    semitones += qualities[quality]
+    semitones = -semitones if interval < 0
+    semitones
+  end
 end
 
-P1  = Interval.new(0,  :per, 1)
-D2  = Interval.new(0,  :dim, 2)
-Mn2 = Interval.new(1,  :min, 2)
-M2  = Interval.new(2,  :maj, 2)
-A2  = Interval.new(3,  :aug, 2)
-D3  = Interval.new(2,  :dim, 3)
-Mn3 = Interval.new(3,  :min, 3)
-M3  = Interval.new(4,  :maj, 3)
-A3  = Interval.new(5,  :aug, 3)
-D4  = Interval.new(4,  :dim, 4)
-P4  = Interval.new(5,  :per, 4)
-A4  = Interval.new(6,  :aug, 4)
-D5  = Interval.new(6,  :dim, 5)
-P5  = Interval.new(7,  :per, 5)
-A5  = Interval.new(8,  :aug, 5)
-D6  = Interval.new(7,  :dim, 6)
-Mn6 = Interval.new(8,  :min, 6)
-M6  = Interval.new(9,  :maj, 6)
-A6  = Interval.new(10, :aug, 6)
-D7  = Interval.new(9,  :dim, 7)
-Mn7 = Interval.new(10, :min, 7)
-M7  = Interval.new(11, :maj, 7)
-A7  = Interval.new(12, :aug, 7)
-D8  = Interval.new(11, :dim, 8)
-P8  = Interval.new(12, :per, 8)
-A8  = Interval.new(13, :aug, 8)
+P1  = Interval.new(:per, 1)
+D2  = Interval.new(:dim, 2)
+Mn2 = Interval.new(:min, 2)
+M2  = Interval.new(:maj, 2)
+A2  = Interval.new(:aug, 2)
+D3  = Interval.new(:dim, 3)
+Mn3 = Interval.new(:min, 3)
+M3  = Interval.new(:maj, 3)
+A3  = Interval.new(:aug, 3)
+D4  = Interval.new(:dim, 4)
+P4  = Interval.new(:per, 4)
+A4  = Interval.new(:aug, 4)
+D5  = Interval.new(:dim, 5)
+P5  = Interval.new(:per, 5)
+A5  = Interval.new(:aug, 5)
+D6  = Interval.new(:dim, 6)
+Mn6 = Interval.new(:min, 6)
+M6  = Interval.new(:maj, 6)
+A6  = Interval.new(:aug, 6)
+D7  = Interval.new(:dim, 7)
+Mn7 = Interval.new(:min, 7)
+M7  = Interval.new(:maj, 7)
+A7  = Interval.new(:aug, 7)
+D8  = Interval.new(:dim, 8)
+P8  = Interval.new(:per, 8)
+A8  = Interval.new(:aug, 8)
 
 class Chord
   include Enumerable
