@@ -76,11 +76,6 @@ class Note
     result_interval
   end
 
-  # get the octave the note is in (middle C is octave 4)
-  def octave
-    @octave
-  end
-
   # raise or lower note to the specified octave
   def va(octave)
     Note.new(@letter, @accidental, octave)

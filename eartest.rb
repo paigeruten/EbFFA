@@ -1,6 +1,6 @@
 # note: this file contains no unit tests or anything like that.
 
-require 'ebffa'
+require 'lib/ebffa'
 
 NOTES = [C, Cs, D, Ds, E, F, Fs, G, Gs, A, As, B]
 
