@@ -2,6 +2,8 @@
 
 require 'lib/ebffa'
 
+include EbFFA
+
 NOTES = [C, Cs, D, Ds, E, F, Fs, G, Gs, A, As, B]
 
 class EarTest
