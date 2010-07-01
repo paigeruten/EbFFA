@@ -1,78 +1,35 @@
-EbFFA
+EbFFA is a musical calculator, at least that's what it's meant to be used as.
+It really is nothing special until you get the actual calculator for it. This
+has a button for each letter A to G; a button for each operator ^, -, +, <<
+and >>; a button for each Interval quality P, A, D, M, and Mn. It's a musical
+calculator and it can totally fit inside your head but, also, your pocket.
+Just whip it out and build up chords and transpose them and invert them and,
+finally, play them, melodically or harmonically. Whatever suits you!
+Whatever's your style. Whatever makes you, as a mathemusician, at your
+happiest.
 
-This is just a bit of a lib that helps you play with music. It uses why's bloopsaphone to play sounds out of your speakers into your ears. I don't know where the sound goes to after that but I don't want to know that.
+The library is named after Eb-F-F-A, the crater gull in the 5th chapter of
+Why's (poignant) Guide to Ruby. This gull... this gull spent weeks stranded on
+a quadruple bunkbed with this alien who was supposedly really hairy all over
+at the time, but had a lot of calculators. He had a calculator that ran Ruby,
+and he used it later to make a musical lottery for the animals. This story may
+or may not have inspired this library's sudden materialization.
 
-Note: I'm not a music expert or anything, I'm just going by what I do know.
+But you should really quit reading this documentation right now and go read
+that story, if you haven't already. It's a magnificent tale. A gundible
+journey. Besides that association, this library has no point to it at all. You
+will get nothing out of it. It's empty calories. Skittles with no sour.
 
-So far, we have Notes and we have Intervals and we have Chords.
+But if you want to just play around, start like this:
 
-Notes are just notes, you know. They have a letter name like A or G, an octave, and perhaps an accidental. 21 constants are defined in ebffa.rb, one for each note. There are 12 distinct notes (semitones) in an octave, but it turns out there are 21 different names for these notes. Names like A, B, C, but also flats like Ab, Bb, Cb, and also sharps like As, Bs, and Cs. These are all defined for you and you can use them like this:
-
-    irb> require 'ebffa'
+    $ irb
+    irb> require 'lib/ebffa'
       => true
-    irb> C        # Note#inspect shows the note and its octave
-      => note C4
-    irb> C.va(2)  # Note#va changes the octave
-      => note C2
-    irb> Gs       # 's' means 'sharp'
-      => note G#4
-    irb> Bb.play  # Note#play plays the note through the bloopsaphone
-      => nil
-    irb> F >> 2   # raises note by two octaves
-      => note F6
-    irb> G << 3   # lowers note by three octaves
-      => note G1
-    irb> Eb == Ds # enharmonic notes are equal
-      => true
-    irb> C.va(4) > C.va(3)
-      => true
-
-Intervals describe intervals between notes. 26 Interval constants are defined for you, ranging from perfect unison (P1) to augmented octave (A8). The Note class implements the ^ method which takes an interval and raises (or lowers) the note by that interval and returns it. It also implements the - method which takes two notes and returns the interval between them. Here are some examples.
-
-    irb> P4
-      => interval P4 A
-    irb> Mn6.below
-      => interval Mn6 B
+    irb> include EbFFA
+      => Object
     irb> C ^ P5
       => note G4
-    irb> C ^ P5.below
-      => note F3
-    irb> A ^ M3
-      => note C#5
-    irb> Fs ^ P8
-      => note F#5
-    irb> C - G
-      => interval P5 A
-    irb> C - (G << 1)
-      => interval P4 B
-    irb> C - (C >> 2)
-      => interval P15 A
 
-Chords are just arrays of Notes. Make Chords by adding together Notes with +. Chord#play plays the notes all at once through the bloopsaphone, harmonically or melodically. A bunch of constructors are currently implemented for making triads and dominant seventh and diminished seventh chords. You can transpose a chord by raising it to an Interval with ^. You can invert a chord using Chord#invert or by passing the inversion of the chord you want as the last argument to a chord constructor (not Chord#new). Examples.
+You just raised a C by a P5 to a G. Crazy! There's more if you're interested.
+Just read the docs.
 
-    irb> C + E + G + Bb
-      => chord C4, E4, G4, Bb4
-    irb> (C + E + G + Bb).play
-      => nil
-    irb> (C + E + G + Bb).play(:melodic)
-      => nil
-    irb> Chord.triad(D)
-      => chord D4, F#4, A4
-    irb> Chord.triad(D, :min)
-      => chord D4, F4, A4
-    irb> Chord.triad(D, :maj, 1)   # D+ first inversion
-      => chord F#4, A4, D5
-    irb> Chord.triad(C, :dim)
-      => chord C4, Eb4, Gb4
-    irb> Chord.triad(C, :halfdim)
-      => chord C4, E4, Gb4
-    irb> Chord.v7(C)
-      => chord G4, B4, D5, F5
-    irb> Chord.o7(C)
-      => chord B3, D4, F4, Ab4
-    irb> Chord.o7(C, 3)            # third inversion
-      => chord Ab4, B4, D5, F5
-    irb> Chord.triad(D) ^ P5
-      => chord A4, C#5, E5
-    irb> Chord.triad(F) >> 2
-      => chord F6, A6, C7
