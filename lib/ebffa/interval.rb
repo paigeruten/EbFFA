@@ -1,21 +1,49 @@
 module EbFFA
+  # An Interval is the distance between two notes. Note#^ and Note#- both use
+  # intervals. They are concious of what "key" you are in, and set up
+  # accidentals accordingly. That is why an Interval isn't just the number of
+  # semitones between notes. It's the number of letter-names between two notes,
+  # with a +quality+ to make up for the missing or excess semitones.
   class Interval
     attr_accessor :semitones, :quality, :interval
 
+    # Make a new Interval. Takes a +quality+ and an +interval+.
+    #
+    # +quality+ can be one of:
+    #
+    # - <tt>:per</tt> for perfect
+    # - <tt>:dim</tt> for diminished
+    # - <tt>:min</tt> for minor
+    # - <tt>:maj</tt> for major
+    # - <tt>:aug</tt> for augmented
+    #
+    # +interval+ is the number of letter-names between notes. There are 3
+    # between C and E, and 5 between C and G, for example.
     def initialize(quality, interval)
       @quality, @interval = quality, interval
 
       @semitones = _interval_to_semitones(@quality, @interval)
     end
 
+    # Intervals are compared by the number of semitones between each interval.
+    # So an augmented fourth equals a diminished fifth.
     def ==(other)
       @semitones == other.semitones
     end
 
+    # Makes an "above" interval a "below" one. I guess it also makes a "below"
+    # interval an "above" interval. So, using the defined constants in
+    # Intervals, you can do something like <tt>P5.below</tt> to get a perfect
+    # fifth below interval.
     def below
       Interval.new(@quality, -@interval)
     end
 
+    # Display the quality as a very short abbreviation, then the interval, then
+    # a 'B' or an 'A' depending on whether it's a below or above interval.
+    #
+    # So, you'll get stuff like "P5 B" (perfect fifth below) and "A4 A"
+    # (augmented fourth above).
     def to_s
       qualities = { :per => 'P', :dim => 'D', :min => 'Mn', :maj => 'M', :aug => 'A' }
 
@@ -26,9 +54,12 @@ module EbFFA
       end
     end
 
+    # Say it's an interval then show it.
     def inspect
       "interval " + to_s
     end
+
+    private
 
     def _interval_to_semitones(quality, interval)
       base_interval = (interval.abs - 1) % 7 + 1
