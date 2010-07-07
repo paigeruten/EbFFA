@@ -1,7 +1,7 @@
 module EbFFA
   # A musical Note. A Note has a letter, an accidental, and an octave. Like an
   # E, flatted, in octave 4. Octave 4 is the one middle C is in. The boundary
-  # between octaves is between the B flat and the C.
+  # between octaves is between the B and the C.
   class Note
     include Comparable
 
