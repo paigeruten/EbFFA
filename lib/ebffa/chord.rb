@@ -4,6 +4,7 @@ module EbFFA
   # constructor such as Chord.triad or Chord.v7.
   class Chord
     include Enumerable
+    include Intervals
 
     attr_accessor :notes
 
@@ -13,10 +14,8 @@ module EbFFA
     end
 
     # Loop through the notes of a Chord. This gives Chord its Enumerable powers.
-    def each
-      @notes.each do |note|
-        yield note
-      end
+    def each(&block)
+      @notes.each(&block)
     end
 
     # Two Chords are equal if they have the same exact notes, regardless of
@@ -58,7 +57,7 @@ module EbFFA
 
     # Say it's a chord, then show the notes it is composed of.
     def inspect
-      "chord " + @notes.map { |note| note.to_s }.join(", ")
+      "chord " + @notes.map(&:to_s).join(", ")
     end
 
     # Raise (or lower) the whole chord by a certain interval.

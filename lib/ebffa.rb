@@ -2,9 +2,10 @@ $:.unshift File.expand_path(File.dirname(__FILE__))
 
 require 'ebffa/note'
 require 'ebffa/interval'
+require 'ebffa/constants'
 require 'ebffa/chord'
 require 'ebffa/sound'
-require 'ebffa/constants'
+
 
 # EbFFA is a musical calculator, at least that's what it's meant to be used as.
 # It really is nothing special until you get the actual calculator for it. This
